@@ -198,15 +198,9 @@ models:
     - name: stg_fhv_tripdata
       description: This data describes FHV trip data. Each row represents a single trip in an FHV.
       columns:
-          - name: fhvtripid
-            data_type: string
-            description: None
           - name: dispatchid
             data_type: string
             description: The TLC Base License Number of the base that dispatched the trip
-          - name: affliationid
-            data_type: string
-            description: None 
           - name: pickup_locationid
             data_type: int64
             description: TLC Taxi Zone in which the trip began

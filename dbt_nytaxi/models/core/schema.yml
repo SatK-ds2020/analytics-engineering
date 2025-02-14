@@ -6,7 +6,7 @@ models:
       List of unique zones idefied by locationid. 
       Includes the service zone they correspond to (Green or yellow).
 
-  - name: dm_monthly_zone_revenue
+  - name: dim_monthly_zone_revenue
     description: >
       Aggregated table of all taxi trips corresponding to both service zones (Green and yellow) per pickup zone, month and service.
       The table contains monthly sums of the fare elements used to calculate the monthly revenue. 
@@ -131,50 +131,33 @@ models:
   - name: fact_fhv_trips
     description: ""
     columns:
-      - name: fhvtripid
-        data_type: string
-        description: ""
-
       - name: dispatchid
         data_type: string
         description: ""
-
-      - name: affliationid
-        data_type: string
-        description: ""
-
       - name: pickup_datetime
         data_type: timestamp
         description: ""
-
       - name: pickup_locationid
         data_type: int64
         description: ""
-
       - name: pickup_borough
         data_type: string
         description: ""
-
       - name: pickup_zone
         data_type: string
         description: ""
-
       - name: dropoff_datetime
         data_type: timestamp
         description: ""
-
       - name: dropoff_locationid
         data_type: int64
         description: ""
-
       - name: dropoff_borough
         data_type: string
         description: ""
-
       - name: dropoff_zone
         data_type: string
         description: ""
-
       - name: sr_flag
         data_type: int64
         description: ""
