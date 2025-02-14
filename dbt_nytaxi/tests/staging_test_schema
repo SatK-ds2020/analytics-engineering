@@ -202,9 +202,18 @@ models:
             description: The TLC Base License Number of the base that dispatched the trip
           - name: pickup_locationid
             description: TLC Taxi Zone in which the trip began
+            tests:
+              - relationships:
+                    to: ref('taxi_zone_lookup')
+                    field: locationid
+                    severity: warn
           - name: dropoff_locationid
             description: TLC Taxi Zone in which the trip ended
-            
+            tests:
+              - relationships:
+                    to: ref('taxi_zone_lookup')
+                    field: locationid
+                    severity: warn
           - name: pickup_datetime
             description: The date and time of the trip pick-up
           - name: dropoff_datetime
@@ -215,31 +224,3 @@ models:
               High Volume FHV company (e.g. Uber Pool, Lyft Line).
               1 = shared trips
               null =  non-shared rides
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
