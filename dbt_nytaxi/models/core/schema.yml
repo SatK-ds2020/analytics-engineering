@@ -34,7 +34,7 @@ models:
 
       - name: service_type
         data_type: string
-        description: ""
+        description: This is the type of services in action green or yellow
 
       - name: ratecodeid
         data_type: int64
