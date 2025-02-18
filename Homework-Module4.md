@@ -47,7 +47,7 @@ You'll need to have completed the ["Build the first dbt models"](https://www.you
 **What is the count of records in the model fact_fhv_trips after running all dependencies with the test run variable disabled (:false)?**  
 Create a staging model for the fhv data, similar to the ones made for yellow and green data. Add an additional filter for keeping only records with pickup time in year 2019.
 Do not add a deduplication step. Run this models without limits (is_test_run: false).
-**Source: dbt-nytaxi/models/staging/stg_fhv_tripdata.sql**
+### Source: dbt-nytaxi/models/staging/stg_fhv_tripdata.sql**
 ```
 {{
     config(
@@ -87,7 +87,7 @@ dbt build --select stg_fhv_tripdata.sql --vars '{'is_test_run': 'false'}'
 
 Create a core model similar to fact trips, but selecting from stg_fhv_tripdata and joining with dim_zones.
 Similar to what we've done in fact_trips, keep only records with known pickup and dropoff locations entries for pickup and dropoff locations.
-**Source: dbt-nytaxi/models/core/fact_fhv_trips.sql**
+### Source: dbt-nytaxi/models/core/fact_fhv_trips.sql**
 ```
 {{
     config(
@@ -131,11 +131,18 @@ dbt build --select fact_fhv_trips.sql --vars '{'is_test_run': 'false'}'
 - 32998722
 - 42998722
 ### Answer: -22998722
-<img src="pics/fhv-fact-trips-total.png" alt="total-fact-fhv" width="500" height="300">
+<img src="pics/fhv-fact-trips-total.png" alt="total-fact-fhv" width="500" height="200">
 
 ### Question 4 (2 points)
 
 **What is the service that had the most rides during the month of July 2019 month with the biggest amount of rides after building a tile for the fact_fhv_trips table and the fact_trips tile as seen in the videos?**
+### Yellow-Green July trip records
+<img src="pics/YG-july.png" alt="total-facts" width="500" height="200">
+OR
+<img src="pics/july-total- trips.png" alt="total-fact" width="500" height="200">
+
+### Fhv July trip records
+<img src="pics/fhv-july.png" alt="total-fact-fhv" width="500" height="200">
 
 Create a dashboard with some tiles that you find interesting to explore the data. One tile should show the amount of trips per month, as done in the videos for fact_trips, including the fact_fhv_trips data.
 
@@ -144,6 +151,14 @@ Create a dashboard with some tiles that you find interesting to explore the data
 - Yellow
 - FHV and Green
 
+## Total Trips
+<img src="pics/Total-trip-query.png" alt="total-fact-fhv" width="500" height="200">
+
+### Yellow-Green Dashboard
+<img src="pics/YG-dashboard.png" alt="total-fact-fhv" width="500" height="200">
+
+### Fhv Dashboard
+<img src="pics/FHV-dashboard.png" alt="total-fact-fhv" width="500" height="200">
 
 ## Submitting the solutions
 
