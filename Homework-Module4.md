@@ -28,6 +28,7 @@ You'll need to have completed the ["Build the first dbt models"](https://www.you
 - Nothing
 
 ### Answer: It applies a limit 100 to all of our models
+<img src="pics/dev-100-stg-fhv.png" alt="stg-100" width="300" height="200">
 
 
 ### Question 2: 
