@@ -139,14 +139,14 @@ dbt build --select fact_fhv_trips.sql --vars '{'is_test_run': 'false'}'
 ### Answer: Yellow
 
 ### Yellow-Green July trip records
-<img src="pics/YG-july.png" alt="total-facts" width="500" height="300">
+<img src="pics/YG-july.png" alt="total-facts" width="500" height="400">
 
 OR
 
-<img src="pics/july-total-trips.png" alt="total-fact" width="500" height="300">
+<img src="pics/july-total-trips.png" alt="total-fact" width="500" height="400">
 
 ### Fhv July trip records
-<img src="pics/fhv-july.png" alt="total-fact-fhv" width="500" height="300">
+<img src="pics/fhv-july.png" alt="total-fact-fhv" width="500" height="400">
 
 Create a dashboard with some tiles that you find interesting to explore the data. One tile should show the amount of trips per month, as done in the videos for fact_trips, including the fact_fhv_trips data.
 
@@ -159,10 +159,10 @@ Create a dashboard with some tiles that you find interesting to explore the data
 <img src="pics/Total-trip-query.png" alt="total-fact-fhv" width="500" height="200">
 
 ### Yellow-Green Dashboard
-<img src="pics/YG-dashboard.png" alt="total-fact-fhv" width="500" height="200">
+<img src="pics/YG-dashboard.png" alt="total-fact-fhv" width="500" height="400">
 
 ### Fhv Dashboard
-<img src="pics/FHV-dashboard.png" alt="total-fact-fhv" width="500" height="200">
+<img src="pics/FHV-dashboard.png" alt="total-fact-fhv" width="500" height="400">
 
 ## Submitting the solutions
 
