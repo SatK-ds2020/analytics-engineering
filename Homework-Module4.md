@@ -1,4 +1,4 @@
-## Module 4 Homework  (DRAFT)
+## Module 4 Homework 
 
 In this homework, we'll use the models developed during the week 4 videos and enhance the already presented dbt project using the already loaded Taxi data for fhv vehicles for year 2019 in our DWH.
 
@@ -19,9 +19,54 @@ instead. If you have access to GCP, you don't need to do it for local Postgres -
 > **Note**: if your answer doesn't match exactly, select the closest option 
 
 ### Data was uploaded to bigquery from python script:  data_upload_gcs.py
-<img src="pics/data_upload-gcs.png" alt="stg-100" width="500" height="300">
+<img src="pics/data_upload_gcs.png" alt="stg-100" width="500" height="300">
+
+## External table created in Bigquery
+```
+CREATE OR REPLACE EXTERNAL TABLE `trips_data_all.yellow_tripdata`
+OPTIONS (
+  format = 'csv',
+  uris = ['gs://dezoomcamp_skhw4_2025/yellow/*.csv']
+);
 
 
+SELECT COUNT(*) FROM `de-zoomcamp2025-448100.trips_data_all.yellow_tripdata`;
+
+CREATE OR REPLACE EXTERNAL TABLE `trips_data_all.green_tripdata`
+OPTIONS (
+  format = 'csv',
+  uris = ['gs://dezoomcamp_skhw4_2025/green/*.csv']
+);
+
+SELECT COUNT(*) FROM `de-zoomcamp2025-448100.trips_data_all.green_tripdata`;
+
+
+CREATE OR REPLACE EXTERNAL TABLE `trips_data_all.fhv_tripdata`
+OPTIONS (
+  format = 'csv',
+  uris = ['gs://dezoomcamp_skhw4_2025/fhv/*.csv']
+);
+
+SELECT COUNT(*) FROM `de-zoomcamp2025-448100.trips_data_all.fhv_tripdata`;
+```
+### External tables in BQ
+<img src="pics/external_table-BQ.png" alt="stg-100" width="500" height="200">
+
+### dbt project created: dbt_nytaxi
+### Project Lineage
+<img src="pics/lineage-graph.png" alt="stg-100" width="500" height="300">
+
+### Project manual triggers to build and run the project
+<img src="pics/manual-trigger-model.png" alt="stg-100" width="500" height="300">
+
+### Project scheduled triggers to build and run the project
+<img src="pics/scheduled-trigger.png" alt="stg-100" width="500" height="300">
+
+### Project Documentation generated
+<img src="pics/doc-gen.png" alt="stg-100" width="500" height="300">
+
+### Final Project lineage generated
+<img src="pics/final-lineage-doc.png" alt="stg-100" width="800" height="200">
 
 ### Question 1: 
 
@@ -46,7 +91,7 @@ You'll need to have completed the ["Build the first dbt models"](https://www.you
 - The code from the development branch we are requesting to merge to main
 
 ### Answer: The code from the development branch we are requesting to merge to main.
-Explaination: CI job will run when we creates a pull request,  to merge their changes from a feature branch into the main branch (or another branch).The creation of the pull request triggers the CI pipeline. This pipeline consists of a series of automated steps designed to ensure the new code integrates well with the existing codebase.
+Explaination: CI job will run when we creates a pull request,  to merge the changes from a feature branch(dbt-project) into the main branch (or another branch).The creation of the pull request triggers the CI pipeline. This pipeline consists of a series of automated steps designed to ensure the new code integrates well with the existing codebase.
 
 ### Question 3 (2 points)
 
@@ -145,10 +190,10 @@ dbt build --select fact_fhv_trips.sql --vars '{'is_test_run': 'false'}'
 
 
 ### Yellow-Green July trip records
-<img src="pics/YG-july.png" alt="total-facts" width="500" height="400">
+<img src="pics/YG-july.png" alt="total-facts" width="800" height="500">
 
 ### Fhv July trip records
-<img src="pics/fhv-july.png" alt="total-fact-fhv" width="500" height="300">
+<img src="pics/fhv-july.png" alt="total-fact-fhv" width="800" height="300">
 
 Create a dashboard with some tiles that you find interesting to explore the data. One tile should show the amount of trips per month, as done in the videos for fact_trips, including the fact_fhv_trips data.
 
@@ -159,21 +204,12 @@ Create a dashboard with some tiles that you find interesting to explore the data
 ### Answer: Yellow
 
 ## Total Trips
-<img src="pics/Total-trip-query.png" alt="total-fact-fhv" width="300" height="200">
+<img src="pics/Total-trip-query.png" alt="total-fact-fhv" width="400" height="300">
 
 ### Yellow-Green Dashboard
-<img src="pics/YG-dashboard.png" alt="total-fact-fhv" width="500" height="400">
+<img src="pics/YG-dashboard.png" alt="total-fact-fhv" width="800" height="500">
 
 ### Fhv Dashboard
-<img src="pics/fhv-monthly.png" alt="total-fact-fhv" width="500" height="300">
-
-## Submitting the solutions
-
-* Form for submitting: https://courses.datatalks.club/de-zoomcamp-2024/homework/hw4
-
-Deadline: 22 February (Thursday), 22:00 CET
+<img src="pics/fhv-monthly.png" alt="total-fact-fhv" width="800" height="300">
 
 
-## Solution
-
-To be published after deadline
