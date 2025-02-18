@@ -136,13 +136,17 @@ dbt build --select fact_fhv_trips.sql --vars '{'is_test_run': 'false'}'
 ### Question 4 (2 points)
 
 **What is the service that had the most rides during the month of July 2019 month with the biggest amount of rides after building a tile for the fact_fhv_trips table and the fact_trips tile as seen in the videos?**
+### Answer: Yellow
+
 ### Yellow-Green July trip records
-<img src="pics/YG-july.png" alt="total-facts" width="500" height="200">
+<img src="pics/YG-july.png" alt="total-facts" width="500" height="300">
+
 OR
-<img src="pics/july-total- trips.png" alt="total-fact" width="500" height="200">
+
+<img src="pics/july-total-trips.png" alt="total-fact" width="500" height="300">
 
 ### Fhv July trip records
-<img src="pics/fhv-july.png" alt="total-fact-fhv" width="500" height="200">
+<img src="pics/fhv-july.png" alt="total-fact-fhv" width="500" height="300">
 
 Create a dashboard with some tiles that you find interesting to explore the data. One tile should show the amount of trips per month, as done in the videos for fact_trips, including the fact_fhv_trips data.
 
