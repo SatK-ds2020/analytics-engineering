@@ -18,6 +18,11 @@ instead. If you have access to GCP, you don't need to do it for local Postgres -
 
 > **Note**: if your answer doesn't match exactly, select the closest option 
 
+### Data was uploaded to bigquery from python script:  data_upload_gcs.py
+<img src="pics/data_upload-gcs.png" alt="stg-100" width="500" height="300">
+
+
+
 ### Question 1: 
 
 **What happens when we execute dbt build --vars '{'is_test_run':'true'}'**
@@ -40,7 +45,8 @@ You'll need to have completed the ["Build the first dbt models"](https://www.you
 - The code from any development branch that has been opened based on main
 - The code from the development branch we are requesting to merge to main
 
-### Answer: The code from the development branch we are requesting to merge to main
+### Answer: The code from the development branch we are requesting to merge to main.
+Explaination: CI job will run when we creates a pull request,  to merge their changes from a feature branch into the main branch (or another branch).The creation of the pull request triggers the CI pipeline. This pipeline consists of a series of automated steps designed to ensure the new code integrates well with the existing codebase.
 
 ### Question 3 (2 points)
 
@@ -153,13 +159,13 @@ Create a dashboard with some tiles that you find interesting to explore the data
 ### Answer: Yellow
 
 ## Total Trips
-<img src="pics/Total-trip-query.png" alt="total-fact-fhv" width="500" height="200">
+<img src="pics/Total-trip-query.png" alt="total-fact-fhv" width="300" height="200">
 
 ### Yellow-Green Dashboard
 <img src="pics/YG-dashboard.png" alt="total-fact-fhv" width="500" height="400">
 
 ### Fhv Dashboard
-<img src="pics/FHV-dashboard.png" alt="total-fact-fhv" width="500" height="400">
+<img src="pics/fhv-monthly.png" alt="total-fact-fhv" width="500" height="300">
 
 ## Submitting the solutions
 
