@@ -27,8 +27,8 @@ You'll need to have completed the ["Build the first dbt models"](https://www.you
 - It applies a _limit 100_ only to our staging models
 - Nothing
 
-### Answer: It applies a limit 100 to all of our models
-<img src="pics/dev-100-stg-fhv.png" alt="stg-100" width="300" height="200">
+### Answer: It applies a _limit 100_ only to our staging models
+<img src="pics/dev-100-stg-fhv.png" alt="stg-100" width="500" height="200">
 
 
 ### Question 2: 
