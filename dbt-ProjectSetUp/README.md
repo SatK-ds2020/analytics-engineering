@@ -126,3 +126,154 @@ renamed as (
 
 select * from renamed
 ```
+
+
+```
+SELECT pickup_datetime,pickup_zone, dropoff_zone,row_num,dense_rnk,trip_duration_p90 FROM `de-zoomcamp2025-448100.trips_data_all.fct_fhv_monthly_zone_traveltime_p90` 
+WHERE dense_rnk=2
+ORDER BY trip_duration_p90 desc;
+
+
+SELECT service_type, fare_amount_p97,fare_amount_p95,fare_amount_p90 
+FROM {{ ref('fct_taxi_trips_monthly_fare_p95')}} 
+WHERE EXTRACT(YEAR from year)= 2020
+  AND EXTRACT(MONTH from month) = 4
+
+
+
+SELECT 
+    latest_year.year_quarter AS Year_Quarter,
+    latest_year.service_type,
+    latest_year.quarter,
+    latest_year.revenue_total_amount AS revenue_2020, 
+    previous_year.revenue_total_amount AS revenue_2019, 
+    ((latest_year.revenue_total_amount - previous_year.revenue_total_amount) / previous_year.revenue_total_amount) * 100 AS YoY_Growth
+FROM 
+    {{ ref('fct_taxi_trips_quarterly_revenue')}} AS latest_year
+JOIN 
+    {{ ref('fct_taxi_trips_quarterly_revenue')}} AS previous_year
+ON 
+    latest_year.year_quarter = previous_year.year_quarter
+AND 
+    latest_year.service_type = previous_year.service_type
+AND 
+    latest_year.year = 2020
+AND 
+    previous_year.year = 2019
+
+
+
+SELECT pickup_datetime,pickup_zone, dropoff_zone,row_num,dense_rnk,trip_duration_p90 FROM `de-zoomcamp2025-448100.trips_data_all.fct_fhv_monthly_zone_traveltime_p90` 
+WHERE dense_rnk=2
+ORDER BY trip_duration_p90 desc;
+
+```
+```
+WITH quarterly_revenue AS (
+    SELECT 
+        year_quarter,
+        year,
+        quarter,
+        service_type,
+        SUM(revenue_quarterly_total_amount) AS agg_total_amount
+    FROM 
+        `de-zoomcamp2025-448100.trips_data_all.fct_taxi_trips_quarterly_revenue`
+    GROUP BY 
+        year_quarter, year, quarter, service_type
+),
+revenue_growth AS (
+    SELECT 
+        latest_year.year_quarter,
+        latest_year.service_type,
+        latest_year.quarter,
+        latest_year.agg_total_amount AS revenue_2020, 
+        previous_year.agg_total_amount AS revenue_2019, 
+        ((latest_year.agg_total_amount - previous_year.agg_total_amount) / previous_year.agg_total_amount) * 100 AS YoY_Growth
+    FROM 
+        quarterly_revenue AS latest_year
+    JOIN 
+        quarterly_revenue AS previous_year
+    ON 
+        latest_year.quarter = previous_year.quarter
+    AND 
+        latest_year.service_type = previous_year.service_type
+    AND 
+        latest_year.year = 2020
+    AND 
+        previous_year.year = 2019
+),
+
+best_worst_quarters AS (
+    SELECT
+        service_type,
+        year_quarter,
+        YoY_Growth,
+        ROW_NUMBER() OVER (PARTITION BY service_type ORDER BY YoY_Growth DESC) AS rn_best,
+        ROW_NUMBER() OVER (PARTITION BY service_type ORDER BY YoY_Growth ASC) AS rn_worst
+    FROM
+        revenue_growth
+)
+SELECT
+    service_type,
+    MAX(CASE WHEN rn_best = 1 THEN year_quarter END) AS best_quarter,
+    MAX(CASE WHEN rn_best = 1 THEN ROUND(YoY_Growth, 2) END) AS best_YoY_Growth,
+    MAX(CASE WHEN rn_worst = 1 THEN year_quarter END) AS worst_quarter,
+    MAX(CASE WHEN rn_worst = 1 THEN ROUND(YoY_Growth, 2) END) AS worst_YoY_Growth
+FROM
+    best_worst_quarters
+GROUP BY
+    service_type;
+
+```
+WITH quarterly_revenue AS (
+    SELECT 
+        year_quarter,
+        year,
+        quarter,
+        service_type,
+        SUM(revenue_quarterly_total_amount) AS agg_total_amount
+    FROM 
+        `de-zoomcamp2025-448100.trips_data_all.fct_taxi_trips_quarterly_revenue`
+    GROUP BY 
+        year_quarter, year, quarter, service_type
+),
+revenue_growth AS (
+    SELECT 
+        latest_year.year_quarter,
+        latest_year.service_type,
+        latest_year.quarter,
+        latest_year.agg_total_amount AS revenue_2020, 
+        previous_year.agg_total_amount AS revenue_2019, 
+        ((latest_year.agg_total_amount - previous_year.agg_total_amount) / previous_year.agg_total_amount) * 100 AS YoY_Growth
+    FROM 
+        quarterly_revenue AS latest_year
+    JOIN 
+        quarterly_revenue AS previous_year
+    ON 
+        latest_year.quarter = previous_year.quarter
+    AND 
+        latest_year.service_type = previous_year.service_type
+    AND 
+        latest_year.year = 2020
+    AND 
+        previous_year.year = 2019
+)
+SELECT 
+    year_quarter,
+    service_type,
+    ROUND(YoY_Growth, 2) AS YoY_Growth,
+    CASE 
+        WHEN YoY_Growth >= 0 THEN CONCAT('In ', year_quarter, ', ', service_type, ' Taxi had +', ROUND(YoY_Growth, 2), '% revenue growth compared to 2019/Q', quarter)
+        ELSE CONCAT('In ', year_quarter, ', ', service_type, ' Taxi had ', ROUND(YoY_Growth, 2), '% revenue growth compared to 2019/Q', quarter)
+    END AS growth_statement
+FROM 
+    revenue_growth
+ORDER BY 
+    year_quarter, service_type;
+```
+
+
+
+
+
+```

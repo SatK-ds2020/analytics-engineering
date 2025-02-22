@@ -102,3 +102,4 @@ OPTIONS (
 
 SELECT COUNT(*) FROM `de-zoomcamp2025-448100.trips_data_all.fhv_tripdata`;
 ```
+
