@@ -1,7 +1,4 @@
-
 ## Homework 4: Analytics Engineering for Data Engineering Zoomcamp 2025
-## Module 4 Homework 
->>>>>>> 6886ac553423dda013b46a203c9727058ab77f06
 
 In this homework, we'll use the models developed during the week 4 videos and enhance the already presented dbt project using the already loaded Taxi data for fhv vehicles for year 2019 in our DWH.
 
@@ -12,14 +9,9 @@ This means that in this homework we use the following data [Datasets list](https
 
 We will use the data loaded for:
 
-* Building a source table: `stg_fhv_tripdata`
-* Building a fact table: `fact_fhv_trips`
-* Create a dashboard 
-
-If you don't have access to GCP, you can do this locally using the ingested data from your Postgres database
-instead. If you have access to GCP, you don't need to do it for local Postgres - only if you want to.
-
-> **Note**: if your answer doesn't match exactly, select the closest option 
+* We built source table: `stg_fhv_tripdata`
+* we built a fact table: `fact_fhv_trips`
+* Created a dashboard 
 
 ### Data was uploaded to bigquery from python script:  data_upload_gcs.py
 <img src="pics/data_upload_gcs.png" alt="stg-100" width="500" height="300">
@@ -68,172 +60,24 @@ SELECT COUNT(*) FROM `de-zoomcamp2025-448100.trips_data_all.fhv_tripdata`;
 ### Project Documentation generated
 <img src="pics/doc-gen.png" alt="stg-100" width="500" height="300">
 
-### Final Project lineage generated
-<img src="pics/final-lineage-doc.png" alt="stg-100" width="800" height="200">
 
-### Question 1: 
-
-**What happens when we execute dbt build --vars '{'is_test_run':'true'}'**
-You'll need to have completed the ["Build the first dbt models"](https://www.youtube.com/watch?v=UVI30Vxzd6c) video. 
-- It's the same as running *dbt build*
-- It applies a _limit 100_ to all of our models
-- It applies a _limit 100_ only to our staging models
-- Nothing
-
-### Answer: It applies a _limit 100_ only to our staging models
-<img src="pics/dev-100-stg-fhv.png" alt="stg-100" width="500" height="300">
-
-
-### Question 2: 
-
-**What is the code that our CI job will run? Where is this code coming from?**  
-
-- The code that has been merged into the main branch
-- The code that is behind the creation object on the dbt_cloud_pr_ schema
-- The code from any development branch that has been opened based on main
-- The code from the development branch we are requesting to merge to main
-
-### Answer: The code from the development branch we are requesting to merge to main.
-Explaination: CI job will run when we creates a pull request,  to merge the changes from a feature branch(dbt-project) into the main branch (or another branch).The creation of the pull request triggers the CI pipeline. This pipeline consists of a series of automated steps designed to ensure the new code integrates well with the existing codebase.
-
-### Question 3 (2 points)
-
-**What is the count of records in the model fact_fhv_trips after running all dependencies with the test run variable disabled (:false)?**  
-Create a staging model for the fhv data, similar to the ones made for yellow and green data. Add an additional filter for keeping only records with pickup time in year 2019.
-Do not add a deduplication step. Run this models without limits (is_test_run: false).
-### Source: dbt-nytaxi/models/staging/stg_fhv_tripdata.sql**
-```
-{{
-    config(
-        materialized='view'
-    )
-}}
-
-select
-    {{ dbt.safe_cast("dispatching_base_num", api.Column.translate_type("string")) }} as dispatchid,
-    {{ dbt.safe_cast("PUlocationID", api.Column.translate_type("integer")) }} as pickup_locationid,
-    {{ dbt.safe_cast("DOlocationID", api.Column.translate_type("integer")) }} as dropoff_locationid,
-    
-    -- timestamps
-    cast(pickup_datetime as timestamp) as pickup_datetime,
-    cast(dropOff_datetime as timestamp) as dropoff_datetime,
-    
-    -- trip info
-    {{ dbt.safe_cast("SR_Flag", api.Column.translate_type("integer")) }} as sr_flag,
-    
-    
-from {{ source('staging','fhv_tripdata') }}
-where extract(year from pickup_datetime) = 2019
-
-
--- dbt build --select <model_name> --vars '{'is_test_run': 'false'}'
-{% if var('is_test_run', default=true) %}
-
-  limit 100
-
-{% endif %}
-```
-## dbt RUN: 
-```
-dbt build --select stg_fhv_tripdata.sql --vars '{'is_test_run': 'false'}'
-```
-<img src="pics/stg-phase.png" alt="stg-100" width="500" height="300">
-
-Create a core model similar to fact trips, but selecting from stg_fhv_tripdata and joining with dim_zones.
-Similar to what we've done in fact_trips, keep only records with known pickup and dropoff locations entries for pickup and dropoff locations.
-### Source: dbt-nytaxi/models/core/fact_fhv_trips.sql**
-```
-{{
-    config(
-        materialized='table'
-    )
-}}
-
-with fhv_tripdata as (
-    select *, 
-     'Fhv' as service_type     
-    from {{ ref('stg_fhv_tripdata') }}
-),
-dim_zones as (
-    select * from {{ ref('dim_zones') }}
-    where borough != 'Unknown'
-)
-select  
-    fhv_tripdata.dispatchid,
-    fhv_tripdata.service_type,
-    fhv_tripdata.pickup_datetime,    
-    fhv_tripdata.pickup_locationid, 
-    pickup_zone.borough as pickup_borough,
-    pickup_zone.zone as pickup_zone,
-    fhv_tripdata.dropoff_datetime, 
-    fhv_tripdata.dropoff_locationid,
-    dropoff_zone.borough as dropoff_borough, 
-    dropoff_zone.zone as dropoff_zone,  
-    fhv_tripdata.sr_flag 
-from fhv_tripdata
-inner join dim_zones as pickup_zone
-on fhv_tripdata.pickup_locationid = pickup_zone.locationid
-inner join dim_zones as dropoff_zone
-on fhv_tripdata.dropoff_locationid = dropoff_zone.locationid
-```
-Run the dbt model without limits (is_test_run: false).
-```
-dbt build --select fact_fhv_trips.sql --vars '{'is_test_run': 'false'}'
-```
-- 12998722
-- 22998722
-- 32998722
-- 42998722
-### Answer: -22998722
-<img src="pics/fhv-fact-trips-total.png" alt="total-fact-fhv" width="500" height="200">
-
-### Question 4 (2 points)
-
-**What is the service that had the most rides during the month of July 2019 month with the biggest amount of rides after building a tile for the fact_fhv_trips table and the fact_trips tile as seen in the videos?**
-
-
-### Yellow-Green July trip records
-<img src="pics/YG-july.png" alt="total-facts" width="800" height="500">
-
-### Fhv July trip records
-<img src="pics/fhv-july.png" alt="total-fact-fhv" width="800" height="300">
-
-Create a dashboard with some tiles that you find interesting to explore the data. One tile should show the amount of trips per month, as done in the videos for fact_trips, including the fact_fhv_trips data.
-
-- FHV
-- Green
-- Yellow
-- FHV and Green
-### Answer: Yellow
-
-## Total Trips
-<img src="pics/Total-trip-query.png" alt="total-fact-fhv" width="400" height="300">
 
 ### Yellow-Green Dashboard
-<img src="pics/YG-dashboard.png" alt="total-fact-fhv" width="800" height="500">
+<img src="pics/YG-dashboard.png" alt="total-fact-fhv" width="700" height="500">
 
 ### Fhv Dashboard
 <img src="pics/fhv-monthly.png" alt="total-fact-fhv" width="500" height="300">
 
-## Module 4 Homework
+### For Homework for 2025  we ensured the total records in each table:
 
-For this homework, you will need the following datasets:
-* [Green Taxi dataset (2019 and 2020)](https://github.com/DataTalksClub/nyc-tlc-data/releases/tag/green)
-* [Yellow Taxi dataset (2019 and 2020)](https://github.com/DataTalksClub/nyc-tlc-data/releases/tag/yellow)
-* [For Hire Vehicle dataset (2019)](https://github.com/DataTalksClub/nyc-tlc-data/releases/tag/fhv)
+1. We had exactly `7,778,101` records in your Green Taxi table
+2. We had exactly `109,047,518` records in your Yellow Taxi table
+3. We had exactly `43,244,696` records in your FHV table
+   
+### Additional dbt Project models/fact tables were generated for homework
+<img src="pics/HW-models-lineage.png" alt="HW-models" width="600" height="300">
 
-
-
-### Before you start
-
-1. Make sure you, **at least**, have them in GCS with a External Table **OR** a Native Table - use whichever method you prefer to accomplish that (Workflow Orchestration with [pandas-gbq](https://cloud.google.com/bigquery/docs/samples/bigquery-pandas-gbq-to-gbq-simple), [dlt for gcs](https://dlthub.com/docs/dlt-ecosystem/destinations/filesystem), [dlt for BigQuery](https://dlthub.com/docs/dlt-ecosystem/destinations/bigquery), [gsutil](https://cloud.google.com/storage/docs/gsutil), etc)
-2. You should have exactly `7,778,101` records in your Green Taxi table
-3. You should have exactly `109,047,518` records in your Yellow Taxi table
-4. You should have exactly `43,244,696` records in your FHV table
-5. Build the staging models for green/yellow as shown in [here](../../../04-analytics-engineering/taxi_rides_ny/models/staging/)
-6. Build the dimension/fact for taxi_trips joining with `dim_zones`  as shown in [here](../../../04-analytics-engineering/taxi_rides_ny/models/core/fact_trips.sql)
-
-
+# Homework Questions
 
 ### Question 1: Understanding dbt model resolution
 
@@ -268,10 +112,11 @@ from {{ source('raw_nyc_tripdata', 'ext_green_taxi' ) }}
 - `select * from myproject.my_nyc_tripdata.ext_green_taxi`
 - `select * from dtc_zoomcamp_2025.raw_nyc_tripdata.green_taxi`
 
-
-## Answer:  `select * from myproject.my_nyc_tripdata.ext_green_taxi`
-
-
+### Answer:  `select * from myproject.my_nyc_tripdata.ext_green_taxi`
+* Explaination:* 
+  - export DBT_BIGQUERY_PROJECT=myproject: This sets the environment variable DBT_BIGQUERY_PROJECT to myproject.
+  - export DBT_BIGQUERY_DATASET=my_nyc_tripdata: This sets the environment variable DBT_BIGQUERY_SOURCE_DATASET to   my_nyc_tripdata.
+Therefore, Given the environment variable setup, the database will resolve to myproject and the schema will resolve to my_nyc_tripdata.
 
 ### Question 2: dbt Variables & Dynamic Models
 
@@ -294,13 +139,19 @@ What would you change to accomplish that in a such way that command line argumen
 - Update the WHERE clause to `pickup_datetime >= CURRENT_DATE - INTERVAL '{{ var("days_back", env_var("DAYS_BACK", "30")) }}' DAY`
 - Update the WHERE clause to `pickup_datetime >= CURRENT_DATE - INTERVAL '{{ env_var("DAYS_BACK", var("days_back", "30")) }}' DAY`
 
-## Answer: - Update the WHERE clause to `pickup_datetime >= CURRENT_DATE - INTERVAL '{{ var("days_back", env_var("DAYS_BACK", "30")) }}' DAY`
+### Answer: - Update the WHERE clause to `pickup_datetime >= CURRENT_DATE - INTERVAL '{{ var("days_back", env_var("DAYS_BACK", "30")) }}' DAY`
+* Explaination: 
+  - The var function retrieves the value of the days_back variable if it is passed as a command line argument.
+  - var("days_back") ensures that if a command line argument is provided, it takes precedence.
+  - env_var("DAYS_BACK", "30") retrieves the value of the DAYS_BACK environment variable. If the environment variable is not    set, it defaults to "30".
+  - By placing env_var("DAYS_BACK", "30") inside the var function, we ensure that the environment variable takes precedence over the default value.
+  - If neither the command line argument nor the environment variable is provided, the default value of "30" days is used.
 
 ### Question 3: dbt Data Lineage and Execution
 
 Considering the data lineage below **and** that taxi_zone_lookup is the **only** materialization build (from a .csv seed file):
 
-![image](./homework_q2.png)
+![image](pics/homework_q2.png)
 
 Select the option that does **NOT** apply for materializing `fct_taxi_monthly_zone_revenue`:
 
@@ -310,7 +161,8 @@ Select the option that does **NOT** apply for materializing `fct_taxi_monthly_zo
 - `dbt run --select +models/core/`
 - `dbt run --select models/staging/+`
 
-## Answer:`dbt run --select models/staging/+`
+### Answer:`dbt run --select models/staging/+`
+This command will only runs models in the staging directory and their dependents. It does not include dim_taxi_trips or fct_taxi_monthly_zone_revenue directly unless they are part of the staging directory’s dependencies. 
 
 ### Question 4: dbt Macros and Jinja
 
@@ -349,22 +201,17 @@ That all being said, regarding macro above, **select all statements that are tru
 - When using `stg`, it materializes in the dataset defined in `DBT_BIGQUERY_STAGING_DATASET`, or defaults to `DBT_BIGQUERY_TARGET_DATASET`
 - When using `staging`, it materializes in the dataset defined in `DBT_BIGQUERY_STAGING_DATASET`, or defaults to `DBT_BIGQUERY_TARGET_DATASET`
 
-Answer:  True statement models are: 
-- Setting a value for  `DBT_BIGQUERY_TARGET_DATASET` env var is mandatory, or it'll fail to compile
-- When using `core`, it materializes in the dataset defined in `DBT_BIGQUERY_TARGET_DATASET`
-- When using `stg`, it materializes in the dataset defined in `DBT_BIGQUERY_STAGING_DATASET`, or defaults to `DBT_BIGQUERY_TARGET_DATASET`
-- When using `staging`, it materializes in the dataset defined in `DBT_BIGQUERY_STAGING_DATASET`, or defaults to `DBT_BIGQUERY_TARGET_DATASET`
+### Answer:  True statement models are: 
+  - Setting a value for  `DBT_BIGQUERY_TARGET_DATASET` env var is mandatory, or it'll fail to compile
+  - When using `core`, it materializes in the dataset defined in `DBT_BIGQUERY_TARGET_DATASET`
+  - When using `stg`, it materializes in the dataset defined in `DBT_BIGQUERY_STAGING_DATASET`, or defaults to `DBT_BIGQUERY_TARGET_DATASET`
+  - When using `staging`, it materializes in the dataset defined in `DBT_BIGQUERY_STAGING_DATASET`, or defaults to `DBT_BIGQUERY_TARGET_DATASET`
 
+* Since the macro explicitly sets the dataset to DBT_BIGQUERY_TARGET_DATASET if the model_type is 'core', it will fail if this environment variable is not defined. However, for model_type other than 'core', the dataset will default to DBT_BIGQUERY_STAGING_DATASET if defined, or fall back to DBT_BIGQUERY_TARGET_DATASET.
 
 ## Serious SQL
 
-Alright, in module 1, you had a SQL refresher, so now let's build on top of that with some serious SQL.
-
-These are not meant to be easy - but they'll boost your SQL and Analytics skills to the next level.  
-So, without any further do, let's get started...
-
-You might want to add some new dimensions `year` (e.g.: 2019, 2020), `quarter` (1, 2, 3, 4), `year_quarter` (e.g.: `2019/Q1`, `2019-Q2`), and `month` (e.g.: 1, 2, ..., 12), **extracted from pickup_datetime**, to your `fct_taxi_trips` OR `dim_taxi_trips.sql` models to facilitate filtering your queries
-
+We added some new dimensions `year` (e.g.: 2019, 2020), `quarter` (1, 2, 3, 4), `year_quarter` (e.g.: `2019/Q1`, `2019-Q2`), and `month` (e.g.: 1, 2, ..., 12), **extracted from pickup_datetime**, to your `fct_taxi_trips` OR `dim_taxi_trips.sql` models to facilitate filtering our queries
 
 ### Question 5: Taxi Quarterly Revenue Growth
 
@@ -471,10 +318,7 @@ FROM
 ORDER BY 
     year_quarter, service_type;
 ```
-<img src="pics/YOY-ALLQuaters.png" alt="YOY-ALLQ" width="500" height="300">
-
-
-
+<img src="pics/YOY-ALLQuaters.png" alt="YOY-ALLQ" width="600" height="300">
 
 ### Compute the Quarterly YoY (Year-over-Year) revenue growth 
   * e.g.: In 2020/Q1, Green Taxi had -12.34% revenue growth compared to 2019/Q1
@@ -535,9 +379,6 @@ FROM
 GROUP BY
     service_type;
 ```
-<img src="pics/YOY-2020.png" alt="YOY-2020" width="500" height="300">
-
-
 Considering the YoY Growth in 2020, which were the yearly quarters with the best (or less worse) and worst results for green, and yellow
 
 - green: {best: 2020/Q2, worst: 2020/Q1}, yellow: {best: 2020/Q2, worst: 2020/Q1}
@@ -547,7 +388,7 @@ Considering the YoY Growth in 2020, which were the yearly quarters with the best
 - green: {best: 2020/Q1, worst: 2020/Q2}, yellow: {best: 2020/Q3, worst: 2020/Q4}
 
 ### Answer: - green: {best: 2020/Q1, worst: 2020/Q2}, yellow: {best: 2020/Q1, worst: 2020/Q2}
-
+<img src="pics/YOY-2020.png" alt="YOY-2020" width="600" height="200">
 
 ### Question 6: P97/P95/P90 Taxi Monthly Fare
 
@@ -686,7 +527,7 @@ WHERE EXTRACT(YEAR from year)= 2020
 ```
 ### Answer: green: {p97: 40.0, p95: 33.0, p90: 24.5}, yellow: {p97: 31.5, p95: 25.5, p90: 19.0}
 
-<img src="pics/HW-Q6.png" alt="YOY-2020" width="500" height="300">
+<img src="pics/HW-Q6.png" alt="YOY-2020" width="600" height="400">
 
 ### Question 7: Top #Nth longest P90 travel time Location for FHV
 
@@ -751,9 +592,6 @@ SELECT pickup_datetime,pickup_zone, dropoff_zone,row_num,dense_rnk,trip_duration
 WHERE dense_rnk=2
 ORDER BY trip_duration_p90 desc;
 ```
-
-<img src="pics/HW4-Q7-1.png" alt="YOY-2020" width="500" height="300">
-
 - LaGuardia Airport, Chinatown, Garment District
 - LaGuardia Airport, Park Slope, Clinton East
 - LaGuardia Airport, Saint Albans, Howard Beach
@@ -761,5 +599,5 @@ ORDER BY trip_duration_p90 desc;
 - LaGuardia Airport, Yorkville East, Greenpoint
 
 ### Answer: - LaGuardia Airport, Chinatown, Garment District
+<img src="pics/HW4-Q7-1.png" alt="YOY-2020" width="500" height="300">
 
-<img src="pics/HW4-Q7.png" alt="YOY-2020" width="500" height="300">
