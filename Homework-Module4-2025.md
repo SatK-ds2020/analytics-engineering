@@ -1,6 +1,5 @@
-<<<<<<< HEAD
+
 ## Homework 4: Analytics Engineering for Data Engineering Zoomcamp 2025
-=======
 ## Module 4 Homework 
 >>>>>>> 6886ac553423dda013b46a203c9727058ab77f06
 
@@ -214,7 +213,6 @@ Create a dashboard with some tiles that you find interesting to explore the data
 <img src="pics/YG-dashboard.png" alt="total-fact-fhv" width="800" height="500">
 
 ### Fhv Dashboard
-<<<<<<< HEAD
 <img src="pics/fhv-monthly.png" alt="total-fact-fhv" width="500" height="300">
 
 ## Module 4 Homework
@@ -765,8 +763,3 @@ ORDER BY trip_duration_p90 desc;
 ### Answer: - LaGuardia Airport, Chinatown, Garment District
 
 <img src="pics/HW4-Q7.png" alt="YOY-2020" width="500" height="300">
-=======
-<img src="pics/fhv-monthly.png" alt="total-fact-fhv" width="800" height="300">
-
-
->>>>>>> 6886ac553423dda013b46a203c9727058ab77f06
